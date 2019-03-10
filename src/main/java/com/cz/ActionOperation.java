@@ -1,19 +1,24 @@
 package com.cz;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import scala.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class ActionOperation {
 
     public static void main(String[] args) {
         // reduce();
-        collect();
+        // collect();
+        countByKey();
     }
 
     /**
@@ -43,9 +48,8 @@ public class ActionOperation {
 
     /**
      * collect,take,count用例
-     *
      */
-    private static void collect(){
+    private static void collect() {
         SparkConf sparkConf = new SparkConf().setAppName("TestCollect").setMaster("local");
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
@@ -64,8 +68,8 @@ public class ActionOperation {
         // 因为会从网络传输数据到本地，而且RDD数据量大会发生内存溢出，
         // 因此推荐使用foreach action操作来最终的RDD进行处理
         List<Integer> collect = doubleNumbers.collect();
-        collect.forEach(ls->{
-            System.out.println("double数据为："+ls);
+        collect.forEach(ls -> {
+            System.out.println("double数据为：" + ls);
         });
 
         System.out.println("---------------------");
@@ -75,14 +79,39 @@ public class ActionOperation {
         // take operation,和collect类似也是从远程集群中，获取RDD,
         // 但是collect是取所有数据，take是取前几个数据
         List<Integer> take = doubleNumbers.take(3);
-        take.forEach(t->{
+        take.forEach(t -> {
             System.out.println("take-----" + t);
         });
 
         sparkContext.close();
     }
 
-    //
+    /**
+     * 测试countByKey
+     */
+    public static void countByKey() {
 
+        SparkConf sparkConf = new SparkConf().setAppName("Test CountByName").setMaster("local");
+        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
+        //构造集合
+        List<Tuple2<String, String>> list = Arrays.asList(
+                new Tuple2<>("湖北", "武汉"),
+                new Tuple2<>("湖北", "随州"),
+                new Tuple2<>("湖北", "襄阳"),
+                new Tuple2<>("青海","西宁")
+        );
+        //并行化集合，创建JavaPairRDD
+        // JavaRDD<Tuple2<String, String>> parallelize = sparkContext.parallelize(list);
+        JavaPairRDD<String, String> pairRDD = sparkContext.parallelizePairs(list);
+        //对JavaRDD应用
+        Map<String, Long> map = pairRDD.countByKey();
+        map.forEach(new BiConsumer<String, Long>() {
+            @Override
+            public void accept(String s, Long aLong) {
+                System.out.println(s + "--" + aLong);
+            }
+        });
+        sparkContext.close();
+    }
 }

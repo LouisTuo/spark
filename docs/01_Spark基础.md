@@ -20,5 +20,10 @@ RDD（Resilient Distributed Dataset）叫做`弹性`分布式数据集，是Spar
 + SQL查询
 + 
 
+## 4.Spark共享变量
+Spark中有2中共享变量
++ Broacdcast(广播变量)，sparkContext.broacdcast()方法
++ Accumulator(累加变量)，多个节点对同一个变量累加操作
+
 
 
