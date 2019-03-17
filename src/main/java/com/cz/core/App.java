@@ -1,4 +1,4 @@
-package com.cz;
+package com.cz.core;
 
 /**
  * Hello world!

@@ -1,4 +1,4 @@
-package com.cz;
+package com.cz.core;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -7,18 +7,19 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 
 /**
- * 使用本地文件创建RDD
+ * 使用HDFS创建RDD
  * 案例：统计文本文件个数
  */
-public class LocalFileRDD {
-    private static final String FILE_PATH = "C:\\Users\\jaclon\\Desktop\\强.txt";
+public class HDFSRDD {
+
+    private static final String FILE_PATH = "hdfs://spark1:9000/spark.txt";
 
     public static void main(String[] args) {
-        //
-        SparkConf sparkConf = new SparkConf().setAppName("LocalFileRDD").setMaster("local");
+        //修改，appName，去除setMaster
+        SparkConf sparkConf = new SparkConf().setAppName("HDFSFileRDD");
 
         JavaSparkContext javaSparkContext = new JavaSparkContext(sparkConf);
-
+        //修改：把textFile（）内的路径修改为HDFS文件
         JavaRDD<String> stringJavaRDD = javaSparkContext.textFile(FILE_PATH);
 
         //统计文本文件内的字数

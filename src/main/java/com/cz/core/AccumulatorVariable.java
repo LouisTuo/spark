@@ -1,4 +1,4 @@
-package com.cz;
+package com.cz.core;
 
 import org.apache.spark.Accumulator;
 import org.apache.spark.SparkConf;
